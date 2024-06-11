@@ -1,0 +1,5 @@
+BJP : 0
+CONGRESS : 0
+BSP : 1
+AAP : 0
+SP : 0

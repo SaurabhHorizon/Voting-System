@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/styles.css" >
+    <title>Voting</title>
+</head>
+<body>
+    <div class="message hide" id="message">
+        <img  class="icon" src="/static/images/OIP.jpeg">
+        <p>Successful</p>
+    </div>
+    <div class="voting-bg">
+        <div class="voter-info">
+            <h1 id="name" class="user">User</h1>
+            <h1 id="status" class="status">status</h1>
+        </div>
+        <div class="image-pannel">
+            <img class="video-feed" src="{{ url_for('video_feed') }}">
+            <div class="buttons-pannel hide" id="buttons">
+                {%for party in parties %}
+                <div class="party-pannel">
+                    <img class="party-icon"  src="/static/images/{{party.icon}}" alt="">
+                    <p>{{party.name}}</p>
+                    <button class="vote-button" onclick="vote('{{party.name}}');">Vote</button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        var voting_processing = false;
+
+        async function vote(party_name){
+            voting_processing = true;
+            document.getElementById("message").classList.remove('hide');
+            document.getElementById("buttons").classList.remove('hide');
+            document.getElementById("buttons").classList.add('hide');
+            try {
+                const response = await fetch(window.location.origin+'/vote?party='+party_name);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                setTimeout(()=>{
+                    document.getElementById("message").classList.add('hide');
+                    voting_processing = false;
+                },5000)
+                return data;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                return null;
+            }
+        }
+
+
+
+        // Function to fetch JSON data
+        async function fetchData() {
+            if(voting_processing){
+                return;
+            }
+            try {
+                const response = await fetch(window.location.origin+'/get_status');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                return null;
+            }
+        }
+        
+        function updateDOM(data){
+            if(voting_processing) return;
+
+             
+             document.getElementById("name").innerHTML = data.name + (data.valid == false ? "Already voted!" : "");
+             document.getElementById("status").innerHTML = data.status == "already_voted" ? "Already voted!":  ( data.status == "unauthorised" ? "Unauthorised" : "Authorised to vote");
+             if( data.status == "unauthorised" || !data.status == "valid" || data.status == "already_voted"){
+                document.getElementById("buttons").classList.add('hide');
+             }
+             else{
+                document.getElementById("buttons").classList.remove('hide');
+             }
+             
+        }
+        
+        
+        async function checkAndUpdate() {
+            let previousData = null;
+            setInterval(async () => {
+                const newData = await fetchData();
+                console.log(newData)
+                if (newData && JSON.stringify(newData) !== JSON.stringify(previousData)) {
+                    //console.log(newData)
+                    updateDOM(newData);
+                    previousData = newData;
+                   //console.log(previousData);
+                }
+            }, 1000); // Send HTTP request every 1 second
+        }
+        
+        // Call the function to start checking for updates
+        checkAndUpdate();
+        
+        </script>
+</body>
+</html>
