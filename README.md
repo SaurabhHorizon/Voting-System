@@ -88,4 +88,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
+Image: 
+![image](https://github.com/SaurabhHorizon/Online-Voting/assets/75537121/5cfae971-522c-4b90-b06a-e077138dcd72)
+
+
 Feel free to modify and expand upon this README as necessary.
