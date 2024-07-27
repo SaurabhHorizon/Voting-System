@@ -35,8 +35,10 @@ This project implements a face recognition voting system using Flask and OpenCV.
     ```sh
     pip install flask opencv-python-headless numpy
     ```
-   **Training data**
-``` python train.py <Name of the person> ```
+   **Training data**:
+``` 
+python train.py <Name of the person>
+ ```
 3. **Run the application**:
     ```sh
     python app.py
